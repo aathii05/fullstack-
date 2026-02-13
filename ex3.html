@@ -1,0 +1,173 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Quiz App</title>
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+    <style>
+        body {
+            font-family: Arial;
+            background: #f2f2f2;
+            text-align: center;
+        }
+
+        .quiz-box {
+            width: 450px;
+            margin: auto;
+            margin-top: 50px;
+            padding: 20px;
+            background: white;
+            border-radius: 10px;
+        }
+
+        #question {
+            text-align: center;
+            margin-bottom: 20px;
+        }
+
+        .option {
+            display: block;
+            text-align: left;
+            width: 200px;
+            margin: 8px auto;
+        }
+
+        button {
+            padding: 8px 18px;
+            margin: 10px;
+            cursor: pointer;
+        }
+
+        #result {
+            font-size: 22px;
+            color: green;
+            margin-top: 20px;
+            text-align: center;
+        }
+    </style>
+</head>
+
+<body>
+<div class="quiz-box">
+
+    <h2 id="question"></h2>
+    <div id="options"></div>
+
+    <div id="navButtons">
+        <button id="prev">Previous</button>
+        <button id="next">Next</button>
+    </div>
+
+    <p id="result"></p>
+    <button id="restart" style="display:none;">Restart Quiz</button>
+
+</div>
+
+<script>
+$(document).ready(function () {
+
+    var quiz = [
+        {
+            question: "What is HTML?",
+            options: ["Programming Language", "Markup Language", "Database", "OS"],
+            answer: 1
+        },
+        {
+            question: "Which symbol is used in jQuery?",
+            options: ["#", "$", "@", "%"],
+            answer: 1
+        },
+        {
+            question: "CSS is used for?",
+            options: ["Design", "Logic", "Database", "Server"],
+            answer: 0
+        }
+    ];
+
+    var current = 0;
+    var userAnswers = [];
+
+    function loadQuestion() {
+
+        $("#navButtons").show();
+        $("#restart").hide();
+        $("#result").text("");
+
+        $("#question").text(quiz[current].question);
+        $("#options").html("");
+
+        for (let i = 0; i < quiz[current].options.length; i++) {
+
+            let checked = userAnswers[current] == i ? "checked" : "";
+
+            $("#options").append(
+                `<label class="option">
+                    <input type="radio" name="opt" value="${i}" ${checked}>
+                    ${quiz[current].options[i]}
+                 </label>`
+            );
+        }
+
+        if (current === 0)
+            $("#prev").hide();
+        else
+            $("#prev").show();
+    }
+
+    loadQuestion();
+
+    $("#next").click(function () {
+
+        let selected = $("input[name='opt']:checked").val();
+
+        if (selected == undefined) {
+            alert("Select an answer first!");
+            return;
+        }
+
+        userAnswers[current] = parseInt(selected);
+
+        if (current < quiz.length - 1) {
+            current++;
+            $(".quiz-box").fadeOut(200, function () {
+                loadQuestion();
+                $(this).fadeIn(200);
+            });
+        }
+        else {
+            showResult();
+        }
+    });
+
+    $("#prev").click(function () {
+        current--;
+        loadQuestion();
+    });
+
+    function showResult() {
+
+        let score = 0;
+
+        for (let i = 0; i < quiz.length; i++) {
+            if (userAnswers[i] == quiz[i].answer)
+                score++;
+        }
+
+        $("#question").text("Quiz Finished");
+        $("#options").html("");
+
+        $("#navButtons").hide();
+        $("#result").text("Your Score: " + score + " / " + quiz.length);
+
+        $("#restart").show();
+    }
+
+    $("#restart").click(function () {
+        current = 0;
+        userAnswers = [];
+        loadQuestion();
+    });
+
+});
+</script>
+</body>
+</html>
